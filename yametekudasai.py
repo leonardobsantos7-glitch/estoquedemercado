@@ -1,11 +1,31 @@
 estoque = []
 
+try:
+    arquivo = open("estoque.txt", "r")
+
+    for linha in arquivo:
+        dados = linha.strip().split("|")
+
+        produto = dados[0]
+        categoria = dados[1]
+        quantidade = int(dados[2])
+
+        estoque.append([produto, categoria, quantidade])
+
+    arquivo.close()
+
+except FileNotFoundError:
+    print("Arquivo de estoque não encontrado. Iniciando com estoque vazio.")
+
+
 while True:
     print(" Estoque Atual ")
+
     if not estoque:
         print("Estoque Vazio")
     else:
         P = 0
+
         while P < len(estoque):
             print(f"📦 Produto: {estoque[P][0]} | Categoria: {estoque[P][1]} | Qtd: {estoque[P][2]}")
             P += 1
@@ -14,14 +34,25 @@ while True:
     acao = input("Deseja adicionar(1), remover(2), alterar(3) ou sair(4)? ").lower()
 
     if acao == "4":
+        arquivo = open("estoque.txt", "w")
+
+        P = 0
+
+        while P < len(estoque):
+            arquivo.write(f"{estoque[P][0]}|{estoque[P][1]}|{estoque[P][2]}\n")
+            P += 1
+
+        arquivo.close()
+
+        print("Estoque salvo com sucesso!")
         print("Encerrando o programa, produtos atuais em estoque:", estoque)
         break
-
 
     elif acao == "2":
         produto = input("Digite o nome do produto que deseja remover ou dar baixa: ").lower()
         linhaencontrada = -1
         a = 0
+
         while a < len(estoque):
             if estoque[a][0] == produto:
                 linhaencontrada = a
@@ -60,6 +91,7 @@ while True:
         produto = input("Digite o nome do produto que deseja adicionar: ").lower()
         existe = False
         a = 0
+
         while a < len(estoque):
             if estoque[a][0] == produto:
                 existe = True
@@ -74,21 +106,43 @@ while True:
         else:
             print("O produto já está em estoque!")
 
-
     elif acao == "3":
         produto = input("Digite o nome do produto que deseja alterar: ").lower()
 
-        if produto in estoque:
-            novo_produto = input("Digite o novo nome do produto: ").lower()
+        linhaencontrada = -1
+        a = 0
 
-            if novo_produto not in estoque:
-                indice = estoque.index(produto)
-                estoque[indice] = novo_produto
-                print("Produto alterado com sucesso!", estoque)
-            else:
-                print("Esse produto já existe no estoque!")
+        while a < len(estoque):
+            if estoque[a][0] == produto:
+                linhaencontrada = a
+                break
+            a += 1
+
+        if linhaencontrada == -1:
+            print("O produto não foi encontrado no estoque!")
+
         else:
-            print("O produto não está em estoque!")
+            novoproduto = input("Digite o novo nome do produto: ").lower()
+
+            if novoproduto == produto:
+                print("O novo nome é igual ao nome atual. Nenhuma alteração foi feita!")
+
+            else:
+                existe = False
+                a = 0
+
+                while a < len(estoque):
+                    if estoque[a][0] == novoproduto:
+                        existe = True
+                        break
+                    a += 1
+
+                if existe:
+                    print("Esse produto já existe no estoque!")
+
+                else:
+                    estoque[linhaencontrada][0] = novoproduto
+                    print("Produto alterado com sucesso!")
 
     else:
         print("Opção inválida! Escolha de 1 a 4.")
